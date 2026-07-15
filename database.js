@@ -5,7 +5,46 @@ const bcrypt = require('bcryptjs');
 
 const DB_PATH = path.join(__dirname, 'panel.db');
 let db = null;
-let SQL = null;
+
+// ---------- Database Initialization ----------
+async function initDB() {
+  try {
+    const SQL = await initSqlJs();  // यहाँ await जरूरी है!
+    if (fs.existsSync(DB_PATH)) {
+      const buffer = fs.readFileSync(DB_PATH);
+      db = new SQL.Database(buffer);
+    } else {
+      db = new SQL.Database();
+    }
+    db.run(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    db.run(`
+      CREATE TABLE IF NOT EXISTS accounts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        phone TEXT NOT NULL,
+        reply_message TEXT DEFAULT '🙏 नमस्ते! यह ऑटोमेटिक रिप्लाई है।',
+        auth_folder TEXT NOT NULL,
+        is_active INTEGER DEFAULT 1,
+        status TEXT DEFAULT 'disconnected',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+      )
+    `);
+    saveDB();
+    console.log('✅ Database initialized successfully.');
+    return true;
+  } catch (err) {
+    console.error('❌ Database init failed:', err);
+    return false;
+  }
+}
 
 function saveDB() {
   if (!db) return;
@@ -13,39 +52,7 @@ function saveDB() {
   fs.writeFileSync(DB_PATH, Buffer.from(data));
 }
 
-function initDB(sqlObj) {
-  SQL = sqlObj;
-  if (fs.existsSync(DB_PATH)) {
-    const buffer = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(buffer);
-  } else {
-    db = new SQL.Database();
-  }
-  db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  db.run(`
-    CREATE TABLE IF NOT EXISTS accounts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      phone TEXT NOT NULL,
-      reply_message TEXT DEFAULT '🙏 नमस्ते! यह ऑटोमेटिक रिप्लाई है।',
-      auth_folder TEXT NOT NULL,
-      is_active INTEGER DEFAULT 1,
-      status TEXT DEFAULT 'disconnected',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-  `);
-  saveDB();
-  console.log('✅ Database initialized successfully.');
-}
-
+// ---------- Helper Functions (Synchronous) ----------
 function getUserByUsername(username) {
   if (!db) throw new Error('Database not initialized');
   const stmt = db.prepare('SELECT * FROM users WHERE username = ?');
@@ -107,13 +114,9 @@ function getAccount(accountId) {
   return result;
 }
 
-const dbReady = initSqlJs().then(SQL => {
-  initDB(SQL);
-  return true;
-});
-
+// ---------- Export Initialization Function ----------
 module.exports = {
-  dbReady,
+  initDB,          // इसे server.js में call करेंगे
   getUserByUsername,
   createUser,
   getAccounts,
