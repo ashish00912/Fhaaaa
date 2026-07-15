@@ -46,7 +46,6 @@ function initDB(sqlObj) {
   console.log('✅ Database initialized successfully.');
 }
 
-// ---------- Functions ----------
 function getUserByUsername(username) {
   if (!db) throw new Error('Database not initialized');
   const stmt = db.prepare('SELECT * FROM users WHERE username = ?');
@@ -108,7 +107,6 @@ function getAccount(accountId) {
   return result;
 }
 
-// ---------- Export a Promise that resolves when DB is ready ----------
 const dbReady = initSqlJs().then(SQL => {
   initDB(SQL);
   return true;
