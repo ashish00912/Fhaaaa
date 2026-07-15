@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
 
@@ -164,8 +164,11 @@ app.post('/api/accounts/:id/reconnect', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Panel running at http://localhost:${PORT}`);
-  if (!fs.existsSync(path.join(__dirname, 'sessions'))) fs.mkdirSync(path.join(__dirname, 'sessions'));
-  console.log(`👑 Owner: @anynomuospapa`);
-});
+// ---------- Start Server only after DB is ready ----------
+db.dbReady.then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Panel running at http://localhost:${PORT}`);
+    if (!fs.existsSync(path.join(__dirname, 'sessions'))) fs.mkdirSync(path.join(__dirname, 'sessions'));
+    console.log(`👑 Owner: @anynomuospapa`);
+  });
+}).catch(err => console.error("❌ Database init failed:", err));
