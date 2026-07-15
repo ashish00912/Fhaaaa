@@ -43,7 +43,6 @@ async function startAccountSocket(accountId) {
 
   sock.ev.on('creds.update', saveCreds);
 
-  // ---------- Connection ----------
   sock.ev.on('connection.update', (update) => {
     const { connection, lastDisconnect } = update;
     if (connection === 'open') {
@@ -64,7 +63,6 @@ async function startAccountSocket(accountId) {
     }
   });
 
-  // ---------- Auto-Reply (Handles ALL messages - 100 or 1000) ----------
   sock.ev.on('messages.upsert', async (m) => {
     const messages = m.messages;
     if (!messages || messages.length === 0) return;
@@ -85,7 +83,6 @@ async function startAccountSocket(accountId) {
       }
     };
 
-    // ----- BATCH PROCESSING (Safe & Fast) -----
     const BATCH_SIZE = 5;
     const DELAY_MS = 200;
 
