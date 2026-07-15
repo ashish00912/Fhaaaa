@@ -10,13 +10,11 @@ const { startAccountSocket, stopAccountSocket } = require('./whatsappManager');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Session
 app.use(session({
   secret: 'your_super_secret_key_change_me',
   resave: false,
@@ -24,7 +22,6 @@ app.use(session({
   cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// Auth Middleware
 function isAuthenticated(req, res, next) {
   if (req.session.userId) return next();
   if (['/login', '/api/login', '/api/signup', '/signup'].includes(req.path)) return next();
@@ -32,9 +29,7 @@ function isAuthenticated(req, res, next) {
 }
 app.use(isAuthenticated);
 
-// ---------- ROUTES ----------
-
-// Login Page
+// ---------- Routes ----------
 app.get('/login', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -56,7 +51,6 @@ app.get('/login', (req, res) => {
   `);
 });
 
-// Signup Page
 app.get('/signup', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -78,7 +72,6 @@ app.get('/signup', (req, res) => {
   `);
 });
 
-// Dashboard
 app.get('/', (req, res) => {
   if (!req.session.userId) return res.redirect('/login');
   res.render('dashboard', { user: req.session.username });
@@ -110,7 +103,6 @@ app.post('/api/logout', (req, res) => {
   res.json({ success: true });
 });
 
-// Account APIs
 app.get('/api/accounts', (req, res) => {
   if (!req.session.userId) return res.status(401).json({ error: 'Unauthorized' });
   const accounts = db.getAccounts(req.session.userId);
@@ -172,7 +164,6 @@ app.post('/api/accounts/:id/reconnect', async (req, res) => {
   }
 });
 
-// ---------- Start Server ----------
 app.listen(PORT, () => {
   console.log(`🚀 Panel running at http://localhost:${PORT}`);
   if (!fs.existsSync(path.join(__dirname, 'sessions'))) fs.mkdirSync(path.join(__dirname, 'sessions'));
