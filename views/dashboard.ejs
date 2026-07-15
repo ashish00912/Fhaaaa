@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🚀 WhatsApp Bot Panel | @anynomuospapa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0b141a 0%, #1a2a33 100%);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(0, 168, 132, 0.08) 0%, transparent 60%),
+                        radial-gradient(circle at 70% 80%, rgba(0, 200, 255, 0.05) 0%, transparent 50%);
+            animation: shimmer 12s ease-in-out infinite alternate;
+            z-index: 0;
+            pointer-events: none;
+        }
+        @keyframes shimmer {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(2%, 2%) rotate(3deg); }
+        }
+        .container { max-width: 1300px; width: 100%; position: relative; z-index: 1; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(31, 44, 51, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 16px 28px;
+            margin-bottom: 30px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            transition: 0.3s;
+        }
+        .header:hover { border-color: rgba(0, 168, 132, 0.3); }
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .brand i { font-size: 32px; color: #00a884; filter: drop-shadow(0 0 12px rgba(0, 168, 132, 0.4)); }
+        .brand h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e9edef, #a0b4c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .brand span {
+            font-size: 14px;
+            font-weight: 400;
+            background: rgba(0, 168, 132, 0.15);
+            padding: 4px 14px;
+            border-radius: 40px;
+            color: #00a884;
+            border: 1px solid rgba(0, 168, 132, 0.2);
+            margin-left: 6px;
+            -webkit-text-fill-color: #00a884;
+        }
+        .user-area { display: flex; align-items: center; gap: 20px; }
+        .owner-tag {
+            font-size: 14px;
+            color: #8696a0;
+            background: rgba(255,255,255,0.04);
+            padding: 6px 16px;
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .owner-tag i { color: #f5b342; margin-right: 6px; }
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #e9edef;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .logout-btn:hover { background: #b33b3b; border-color: #b33b3b; transform: scale(1.02); }
+
+        .add-section {
+            background: rgba(31, 44, 51, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 28px 32px;
+            margin-bottom: 36px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: flex-end;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .add-section .field { flex: 1 1 220px; min-width: 180px; }
+        .add-section label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #8696a0;
+            margin-bottom: 6px;
+        }
+        .add-section label i { margin-right: 6px; color: #00a884; }
+        .add-section input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(42, 57, 66, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            color: #e9edef;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .add-section input:focus { border-color: #00a884; box-shadow: 0 0 0 3px rgba(0, 168, 132, 0.15); }
+        .btn-primary {
+            background: linear-gradient(135deg, #00a884, #00cba0);
+            border: none;
+            color: #0b141a;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 52px;
+            white-space: nowrap;
+            box-shadow: 0 6px 20px rgba(0, 168, 132, 0.25);
+        }
+        .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 30px rgba(0, 168, 132, 0.4); }
+        .btn-primary:active { transform: scale(0.97); }
+
+        .accounts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+        .account-card {
+            background: rgba(31, 44, 51, 0.55);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 22px;
+            transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+            border-left: 5px solid #2a3942;
+            position: relative;
+            overflow: hidden;
+        }
+        .account-card:hover { transform: translateY(-6px) scale(1.01); border-color: rgba(0, 168, 132, 0.2); }
+        .account-card.connected { border-left-color: #00a884; }
+        .account-card.disconnected { border-left-color: #b33b3b; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .phone { font-size: 19px; font-weight: 700; color: #e9edef; display: flex; align-items: center; gap: 8px; }
+        .phone i { color: #00a884; }
+        .status-badge {
+            font-size: 12px; font-weight: 600; padding: 5px 16px; border-radius: 40px;
+            background: #2a3942; color: #8696a0; display: flex; align-items: center; gap: 6px;
+        }
+        .status-badge.connected { background: rgba(0, 168, 132, 0.2); color: #00a884; }
+        .status-badge.disconnected { background: rgba(179, 59, 59, 0.2); color: #b33b3b; }
+        .reply-section { display: flex; gap: 10px; margin: 16px 0 12px 0; align-items: center; }
+        .reply-section input {
+            flex: 1; background: rgba(42, 57, 66, 0.6); border: 1px solid rgba(255,255,255,0.05);
+            padding: 10px 14px; border-radius: 12px; color: #e9edef; font-size: 14px; outline: none; transition: 0.3s;
+        }
+        .reply-section input:focus { border-color: #00a884; }
+        .btn-edit {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06);
+            color: #e9edef; padding: 8px 14px; border-radius: 10px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-edit:hover { background: #00a884; color: #0b141a; }
+        .card-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.04); }
+        .btn-sm { padding: 6px 16px; font-size: 13px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 6px; }
+        .btn-reconnect { background: rgba(0, 168, 132, 0.15); color: #00a884; }
+        .btn-reconnect:hover { background: #00a884; color: #0b141a; }
+        .btn-danger { background: rgba(179, 59, 59, 0.15); color: #b33b3b; }
+        .btn-danger:hover { background: #b33b3b; color: white; }
+
+        .code-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 999;
+        }
+        .code-box {
+            background: #1f2c33; border-radius: 28px; padding: 44px 36px; max-width: 420px; width: 90%;
+            text-align: center; border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.7); animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .code-box h3 { color: #e9edef; font-size: 22px; }
+        .code-box h3 i { color: #f5b342; margin-right: 8px; }
+        .big-code {
+            font-size: 48px; font-weight: 800; letter-spacing: 8px; color: #00a884;
+            background: #0b141a; padding: 18px 12px; border-radius: 16px; margin: 18px 0;
+            font-family: 'Courier New', monospace; border: 1px solid rgba(0,168,132,0.2);
+        }
+        .code-box .instructions { color: #8696a0; font-size: 14px; line-height: 1.7; text-align: left; padding: 0 8px; }
+        .code-box .instructions i { color: #00a884; width: 20px; }
+        .code-box .close-btn {
+            background: #00a884; border: none; color: #0b141a; padding: 12px 32px; border-radius: 40px;
+            font-weight: 700; font-size: 15px; margin-top: 20px; cursor: pointer; transition: 0.3s;
+        }
+        .code-box .close-btn:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(0,168,132,0.4); }
+
+        .toast {
+            position: fixed; bottom: 30px; right: 30px;
+            background: rgba(31,44,51,0.9); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.06); color: #e9edef;
+            padding: 16px 28px; border-radius: 16px; border-left: 5px solid #00a884;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5); display: none; z-index: 1000;
+            font-weight: 500; font-size: 14px;
+        }
+        .toast i { margin-right: 10px; }
+        .empty-msg {
+            text-align: center; color: #8696a0; padding: 60px 20px;
+            background: rgba(31,44,51,0.3); border-radius: 24px; border: 1px dashed rgba(255,255,255,0.06);
+            font-size: 18px;
+        }
+        .empty-msg i { font-size: 48px; margin-bottom: 12px; display: block; color: #2a3942; }
+
+        .footer {
+            margin-top: 40px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.04);
+            text-align: center; color: #586b75; font-size: 14px; letter-spacing: 0.4px;
+        }
+        .footer i { color: #f5b342; margin: 0 4px; }
+        .footer strong { color: #e9edef; font-weight: 600; }
+
+        @media (max-width: 700px) { .header { flex-wrap: wrap; gap: 12px; } .brand h1 { font-size: 20px; } .add-section { padding: 20px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="brand">
+            <i class="fab fa-whatsapp"></i>
+            <h1>Bot Manager <span>v2.0</span></h1>
+        </div>
+        <div class="user-area">
+            <div class="owner-tag"><i class="fas fa-crown"></i> Owner: @anynomuospapa</div>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="add-section">
+        <div class="field">
+            <label><i class="fas fa-phone"></i> Phone Number (देश कोड सहित)</label>
+            <input type="text" id="phoneInput" placeholder="जैसे: 919876543210">
+        </div>
+        <div class="field">
+            <label><i class="fas fa-reply"></i> Auto-Reply Message</label>
+            <input type="text" id="replyInput" placeholder="नमस्ते! मैं ऑटो बॉट हूँ">
+        </div>
+        <button class="btn-primary" onclick="addAccount()"><i class="fas fa-plus-circle"></i> Connect</button>
+    </div>
+
+    <div id="accountsContainer" class="accounts-grid">
+        <div class="empty-msg"><i class="fas fa-wifi-slash"></i> Loading accounts...</div>
+    </div>
+
+    <div class="footer">
+        <i class="fas fa-code"></i> Developed with <i class="fas fa-heart" style="color:#b33b3b;"></i> by <strong>@anynomuospapa</strong> &bull; All Rights Reserved
+    </div>
+</div>
+
+<div id="codeModal" class="code-modal">
+    <div class="code-box">
+        <h3><i class="fas fa-key"></i> WhatsApp Pairing Code</h3>
+        <div class="big-code" id="displayCode">------</div>
+        <div class="instructions">
+            <i class="fas fa-check-circle"></i> 1. Phone पर WhatsApp खोलें<br>
+            <i class="fas fa-check-circle"></i> 2. Linked Devices → Link with phone number<br>
+            <i class="fas fa-check-circle"></i> 3. ऊपर Code डालें और Done करें
+        </div>
+        <button class="close-btn" onclick="closeModal()"><i class="fas fa-check"></i> Done, Code Entered</button>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+    let currentAccountId = null;
+
+    async function fetchAccounts() {
+        const res = await fetch('/api/accounts');
+        if (res.status === 401) { window.location.href = '/login'; return; }
+        const accounts = await res.json();
+        renderAccounts(accounts);
+    }
+
+    function renderAccounts(accounts) {
+        const container = document.getElementById('accountsContainer');
+        if (!accounts || accounts.length === 0) {
+            container.innerHTML = `<div class="empty-msg"><i class="fas fa-inbox"></i> कोई अकाउंट नहीं। ऊपर से नया जोड़ें!</div>`;
+            return;
+        }
+        container.innerHTML = accounts.map(acc => `
+            <div class="account-card ${acc.status}" id="card-${acc.id}">
+                <div class="card-header">
+                    <span class="phone"><i class="fab fa-whatsapp"></i> ${acc.phone}</span>
+                    <span class="status-badge ${acc.status}"><i class="fas fa-circle" style="font-size:8px;"></i> ${acc.status.toUpperCase()}</span>
+                </div>
+                <div class="reply-section">
+                    <input type="text" id="reply-${acc.id}" value="${acc.reply_message}" placeholder="Reply message...">
+                    <button class="btn-edit" onclick="updateReply(${acc.id})"><i class="fas fa-save"></i></button>
+                </div>
+                <div class="card-actions">
+                    ${acc.status === 'disconnected' ? `<button class="btn-sm btn-reconnect" onclick="reconnect(${acc.id})"><i class="fas fa-sync-alt"></i> Reconnect</button>` : ''}
+                    <button class="btn-sm btn-danger" onclick="removeAccount(${acc.id})"><i class="fas fa-trash-alt"></i> Remove</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function addAccount() {
+        const phone = document.getElementById('phoneInput').value.trim();
+        const reply = document.getElementById('replyInput').value.trim();
+        if (!phone) { showToast('❌ Phone number daalo!', 'error'); return; }
+
+        const btn = event.target;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/api/accounts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, reply_message: reply })
+            });
+            const data = await res.json();
+            if (data.success) {
+                currentAccountId = data.accountId;
+                document.getElementById('displayCode').textContent = data.pairingCode || '------';
+                document.getElementById('codeModal').style.display = 'flex';
+                showToast('✅ Account added! Enter code in WhatsApp.', 'success');
+                fetchAccounts();
+            } else {
+                showToast('❌ ' + data.error, 'error');
+            }
+        } catch (e) { showToast('❌ Server Error', 'error'); }
+        btn.innerHTML = '<i class="fas fa-plus-circle"></i> Connect';
+        btn.disabled = false;
+        document.getElementById('phoneInput').value = '';
+        document.getElementById('replyInput').value = '';
+    }
+
+    async function updateReply(accountId) {
+        const msg = document.getElementById(`reply-${accountId}`).value;
+        const res = await fetch(`/api/accounts/${accountId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reply_message: msg })
+        });
+        if (res.ok) showToast('✅ Reply Updated!', 'success');
+        else showToast('❌ Update failed', 'error');
+    }
+
+    async function removeAccount(accountId) {
+        if (!confirm('⚠️ सच में हटाना है? Session भी delete होगा!')) return;
+        const res = await fetch(`/api/accounts/${accountId}`, { method: 'DELETE' });
+        if (res.ok) { showToast('🗑️ Removed', 'info'); fetchAccounts(); }
+        else showToast('❌ Delete failed', 'error');
+    }
+
+    async function reconnect(accountId) {
+        showToast('🔄 Reconnecting...', 'info');
+        const res = await fetch(`/api/accounts/${accountId}/reconnect`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success && data.pairingCode) {
+            currentAccountId = accountId;
+            document.getElementById('displayCode').textContent = data.pairingCode;
+            document.getElementById('codeModal').style.display = 'flex';
+        } else if (data.success) {
+            showToast('✅ Connected!', 'success');
+        } else {
+            showToast('❌ ' + data.error, 'error');
+        }
+        fetchAccounts();
+    }
+
+    function closeModal() {
+        document.getElementById('codeModal').style.display = 'none';
+        if (currentAccountId) setTimeout(fetchAccounts, 3000);
+        currentAccountId = null;
+    }
+
+    function showToast(msg, type = 'info') {
+        const t = document.getElementById('toast');
+        const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+        t.innerHTML = `${icon} ${msg}`;
+        t.style.display = 'block';
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.style.display = 'none', 4500);
+    }
+
+    async function logout() {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    }
+
+    fetchAccounts();
+    setInterval(fetchAccounts, 6000);
+</script>
+</body>
+</html>
