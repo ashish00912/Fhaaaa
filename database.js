@@ -1,17 +1,25 @@
 const initSqlJs = require('sql.js');
 const fs = require('fs');
 const path = require('path');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const DB_PATH = path.join(__dirname, 'panel.db');
-let db;
+let db = null;
+let SQL = null;
 
-function initDB() {
+function saveDB() {
+  if (!db) return;
+  const data = db.export();
+  fs.writeFileSync(DB_PATH, Buffer.from(data));
+}
+
+function initDB(sqlObj) {
+  SQL = sqlObj;
   if (fs.existsSync(DB_PATH)) {
     const buffer = fs.readFileSync(DB_PATH);
-    db = new initSqlJs.Database(buffer);
+    db = new SQL.Database(buffer);
   } else {
-    db = new initSqlJs.Database();
+    db = new SQL.Database();
   }
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -35,14 +43,12 @@ function initDB() {
     )
   `);
   saveDB();
+  console.log('✅ Database initialized successfully.');
 }
 
-function saveDB() {
-  const data = db.export();
-  fs.writeFileSync(DB_PATH, Buffer.from(data));
-}
-
+// ---------- Functions ----------
 function getUserByUsername(username) {
+  if (!db) throw new Error('Database not initialized');
   const stmt = db.prepare('SELECT * FROM users WHERE username = ?');
   const result = stmt.get(username);
   stmt.free();
@@ -50,6 +56,7 @@ function getUserByUsername(username) {
 }
 
 function createUser(username, password) {
+  if (!db) throw new Error('Database not initialized');
   const hashed = bcrypt.hashSync(password, 10);
   db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashed]);
   saveDB();
@@ -57,6 +64,7 @@ function createUser(username, password) {
 }
 
 function getAccounts(userId) {
+  if (!db) throw new Error('Database not initialized');
   const stmt = db.prepare('SELECT * FROM accounts WHERE user_id = ?');
   const rows = stmt.all(userId);
   stmt.free();
@@ -64,6 +72,7 @@ function getAccounts(userId) {
 }
 
 function createAccount(userId, phone, authFolder, replyMessage = null) {
+  if (!db) throw new Error('Database not initialized');
   const msg = replyMessage || '🙏 नमस्ते! यह ऑटोमेटिक रिप्लाई है।';
   db.run(
     'INSERT INTO accounts (user_id, phone, auth_folder, reply_message) VALUES (?, ?, ?, ?)',
@@ -74,33 +83,39 @@ function createAccount(userId, phone, authFolder, replyMessage = null) {
 }
 
 function updateAccountStatus(accountId, status) {
+  if (!db) throw new Error('Database not initialized');
   db.run('UPDATE accounts SET status = ? WHERE id = ?', [status, accountId]);
   saveDB();
 }
 
 function updateAccountReply(accountId, message) {
+  if (!db) throw new Error('Database not initialized');
   db.run('UPDATE accounts SET reply_message = ? WHERE id = ?', [message, accountId]);
   saveDB();
 }
 
 function deleteAccount(accountId) {
+  if (!db) throw new Error('Database not initialized');
   db.run('DELETE FROM accounts WHERE id = ?', [accountId]);
   saveDB();
 }
 
 function getAccount(accountId) {
+  if (!db) throw new Error('Database not initialized');
   const stmt = db.prepare('SELECT * FROM accounts WHERE id = ?');
   const result = stmt.get(accountId);
   stmt.free();
   return result;
 }
 
-initSqlJs().then(SQL => {
-  initDB();
-}).catch(console.error);
+// ---------- Export a Promise that resolves when DB is ready ----------
+const dbReady = initSqlJs().then(SQL => {
+  initDB(SQL);
+  return true;
+});
 
 module.exports = {
-  db,
+  dbReady,
   getUserByUsername,
   createUser,
   getAccounts,
